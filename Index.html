@@ -1,0 +1,1496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lord of Mysteries — Character Sheet</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+          --bg: #1a1a1a;
+          --surface: #242424;
+          --surface2: #2e2e2e;
+          --border: #4a4a4a;
+          --border-light: #5a5a5a;
+          --gold: #c9a84c;
+          --gold-light: #e0c070;
+          --text: #e8e0d0;
+          --text-dim: #a09880;
+          --text-label: #c0b090;
+          --crimson: #8b2020;
+          --crimson-light: #c03030;
+          --dot-filled: #c9a84c;
+          --dot-empty: #3a3a3a;
+          --dot-border: #6a6a6a;
+          --input-bg: #1e1e1e;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+          background: var(--bg);
+          color: var(--text);
+          font-family: 'Crimson Text', Georgia, serif;
+          font-size: 14px;
+          min-height: 100vh;
+        }
+
+        /* ── HEADER ── */
+        .sheet-header {
+          background: linear-gradient(180deg, #0d0d0d 0%, #1a1a1a 100%);
+          border-bottom: 2px solid var(--gold);
+          padding: 18px 24px 14px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+
+        .sheet-title {
+          font-family: 'Cinzel', serif;
+          font-size: 26px;
+          font-weight: 700;
+          letter-spacing: 4px;
+          color: var(--gold);
+          text-shadow: 0 0 20px rgba(201,168,76,0.3);
+        }
+
+        .sheet-subtitle {
+          font-family: 'Cinzel', serif;
+          font-size: 10px;
+          letter-spacing: 3px;
+          color: var(--text-dim);
+          margin-top: 2px;
+        }
+
+        .header-ornament {
+          color: var(--gold);
+          font-size: 28px;
+          opacity: 0.5;
+        }
+
+        /* ── TABS ── */
+        .tab-bar {
+          display: flex;
+          background: #111;
+          border-bottom: 1px solid var(--border);
+          padding: 0 24px;
+        }
+
+        .tab-btn {
+          font-family: 'Cinzel', serif;
+          font-size: 11px;
+          letter-spacing: 2px;
+          color: var(--text-dim);
+          padding: 10px 20px;
+          border: none;
+          background: none;
+          cursor: pointer;
+          border-bottom: 2px solid transparent;
+          transition: all 0.2s;
+          text-transform: uppercase;
+        }
+
+        .tab-btn:hover { color: var(--text); }
+
+        .tab-btn.active {
+          color: var(--gold);
+          border-bottom-color: var(--gold);
+        }
+
+        /* ── CONTENT ── */
+        .tab-content { display: none; padding: 20px 24px; }
+        .tab-content.active { display: block; }
+
+        /* ── SECTION HEADERS ── */
+        .section-title {
+          font-family: 'Cinzel', serif;
+          font-size: 11px;
+          letter-spacing: 3px;
+          color: var(--gold);
+          text-transform: uppercase;
+          border-bottom: 1px solid var(--border);
+          padding-bottom: 4px;
+          margin-bottom: 10px;
+        }
+
+        /* ── INPUTS ── */
+        input[type="text"], textarea {
+          background: var(--input-bg);
+          border: none;
+          border-bottom: 1px solid var(--border);
+          color: var(--text);
+          font-family: 'Crimson Text', serif;
+          font-size: 13px;
+          padding: 2px 4px;
+          width: 100%;
+          outline: none;
+          transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+          border-bottom-color: var(--gold);
+        }
+
+        textarea { resize: vertical; }
+
+        label {
+          font-size: 10px;
+          letter-spacing: 1px;
+          color: var(--text-label);
+          text-transform: uppercase;
+          display: block;
+          margin-bottom: 2px;
+        }
+
+        .field-group {
+          display: flex;
+          flex-direction: column;
+        }
+
+        /* ── DOT TRACKS ── */
+        .dots {
+          display: flex;
+          gap: 4px;
+          align-items: center;
+        }
+
+        .dot {
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          background: var(--dot-empty);
+          border: 1px solid var(--dot-border);
+          cursor: pointer;
+          transition: background 0.15s;
+          flex-shrink: 0;
+        }
+
+        .dot.filled { background: var(--dot-filled); border-color: var(--gold); }
+        .dot.filled-red { background: var(--crimson-light); border-color: var(--crimson); }
+
+        /* ── HEALTH TRACK ── */
+        .health-dot {
+          width: 16px;
+          height: 16px;
+          border-radius: 3px;
+          background: var(--dot-empty);
+          border: 1px solid var(--dot-border);
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 10px;
+          color: transparent;
+          transition: all 0.15s;
+        }
+
+        .health-dot.bashing { color: var(--text); background: var(--surface2); }
+        .health-dot.lethal { color: var(--crimson-light); }
+        .health-dot.aggravated { color: var(--crimson-light); background: #3a1010; }
+
+        /* ── GRIDS ── */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+        .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; }
+
+        /* ── ATTRIBUTES ── */
+        .attr-block {
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: 4px;
+          padding: 10px;
+        }
+
+        .attr-category {
+          font-family: 'Cinzel', serif;
+          font-size: 10px;
+          letter-spacing: 2px;
+          color: var(--text-dim);
+          text-align: center;
+          margin-bottom: 8px;
+        }
+
+        .attr-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 6px;
+        }
+
+        .attr-name {
+          font-size: 13px;
+          color: var(--text);
+          min-width: 90px;
+        }
+
+        .attr-role {
+          font-size: 9px;
+          color: var(--text-dim);
+          letter-spacing: 1px;
+          min-width: 60px;
+          text-align: right;
+          margin-right: 6px;
+        }
+
+        /* ── SKILLS ── */
+        .skill-col {
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: 4px;
+          padding: 10px;
+        }
+
+        .skill-category {
+          font-family: 'Cinzel', serif;
+          font-size: 11px;
+          letter-spacing: 2px;
+          color: var(--gold);
+          text-align: center;
+          margin-bottom: 4px;
+        }
+
+        .skill-unskilled {
+          font-size: 9px;
+          color: var(--text-dim);
+          text-align: center;
+          margin-bottom: 8px;
+          font-style: italic;
+        }
+
+        .skill-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 5px;
+        }
+
+        .skill-name {
+          font-size: 12px;
+          color: var(--text);
+          flex: 1;
+        }
+
+        .skill-spec {
+          width: 60px;
+          border-bottom: 1px solid var(--border);
+          height: 14px;
+          margin-right: 6px;
+          font-size: 10px;
+          color: var(--text-dim);
+          background: none;
+          border-top: none;
+          border-left: none;
+          border-right: none;
+          outline: none;
+          font-family: 'Crimson Text', serif;
+        }
+
+        /* ── MERITS ── */
+        .merit-row {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          margin-bottom: 5px;
+        }
+
+        .merit-name-input {
+          flex: 1;
+        }
+
+        /* ── INTEGRITY / WILLPOWER ── */
+        .track-block {
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: 4px;
+          padding: 10px;
+          margin-bottom: 10px;
+        }
+
+        .track-title {
+          font-family: 'Cinzel', serif;
+          font-size: 10px;
+          letter-spacing: 2px;
+          color: var(--gold);
+          text-align: center;
+          margin-bottom: 6px;
+        }
+
+        .track-dots {
+          display: flex;
+          justify-content: center;
+          gap: 4px;
+          flex-wrap: wrap;
+        }
+
+        /* ── CORRUPTION TRACK ── */
+        .corruption-block {
+          background: var(--surface);
+          border: 1px solid var(--crimson);
+          border-radius: 4px;
+          padding: 10px;
+          margin-bottom: 10px;
+        }
+
+        .corruption-title {
+          font-family: 'Cinzel', serif;
+          font-size: 10px;
+          letter-spacing: 2px;
+          color: var(--crimson-light);
+          text-align: center;
+          margin-bottom: 6px;
+        }
+
+        .corruption-zones {
+          display: flex;
+          gap: 2px;
+          justify-content: center;
+          margin-bottom: 6px;
+        }
+
+        .c-dot {
+          width: 14px;
+          height: 14px;
+          border-radius: 50%;
+          background: var(--dot-empty);
+          border: 1px solid var(--dot-border);
+          cursor: pointer;
+          transition: background 0.15s;
+        }
+
+        .c-dot.stable { }
+        .c-dot.critical { border-color: var(--crimson); }
+        .c-dot.filled-stable { background: #4a7a4a; border-color: #6aaa6a; }
+        .c-dot.filled-critical { background: var(--crimson-light); border-color: var(--crimson); }
+
+        .corruption-legend {
+          display: flex;
+          justify-content: space-between;
+          font-size: 9px;
+          color: var(--text-dim);
+          letter-spacing: 1px;
+        }
+
+        .derangement-row {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          margin-bottom: 4px;
+        }
+
+        .derangement-name {
+          flex: 2;
+        }
+
+        .derangement-level {
+          width: 30px;
+          text-align: center;
+        }
+
+        /* ── TABLES ── */
+        .sheet-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-bottom: 12px;
+        }
+
+        .sheet-table th {
+          font-family: 'Cinzel', serif;
+          font-size: 9px;
+          letter-spacing: 1.5px;
+          color: var(--gold);
+          text-align: left;
+          padding: 4px 6px;
+          border-bottom: 1px solid var(--gold);
+          background: var(--surface);
+          text-transform: uppercase;
+        }
+
+        .sheet-table td {
+          padding: 3px 6px;
+          border-bottom: 1px solid var(--border);
+        }
+
+        .sheet-table tr:nth-child(even) td { background: var(--surface); }
+        .sheet-table tr:nth-child(odd) td { background: var(--input-bg); }
+
+        .sheet-table td input[type="text"] {
+          background: transparent;
+          border-bottom: none;
+          font-size: 12px;
+          padding: 1px 2px;
+        }
+
+        /* ── DIGESTION DOTS ── */
+        .dig-dots {
+          display: flex;
+          gap: 3px;
+          justify-content: center;
+        }
+
+        .dig-dot {
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          background: var(--dot-empty);
+          border: 1px solid var(--dot-border);
+          cursor: pointer;
+          transition: background 0.15s;
+        }
+
+        .dig-dot.filled { background: var(--gold); border-color: var(--gold-light); }
+
+        /* ── CHECKBOXES ── */
+        .custom-check {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          cursor: pointer;
+          font-size: 11px;
+          color: var(--text-dim);
+        }
+
+        .custom-check input { display: none; }
+
+        .check-box {
+          width: 12px;
+          height: 12px;
+          border: 1px solid var(--border-light);
+          background: var(--dot-empty);
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 9px;
+          color: transparent;
+          flex-shrink: 0;
+          transition: all 0.15s;
+        }
+
+        .custom-check input:checked + .check-box {
+          background: var(--gold);
+          border-color: var(--gold-light);
+          color: #1a1a1a;
+        }
+
+        /* ── REFERENCE BOX ── */
+        .ref-box {
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-left: 3px solid var(--gold);
+          border-radius: 0 4px 4px 0;
+          padding: 8px 10px;
+          margin: 8px 0;
+          font-size: 11px;
+          color: var(--text-dim);
+          line-height: 1.6;
+        }
+
+        .ref-box strong { color: var(--gold-light); }
+
+        /* ── POWER TYPE TAGS ── */
+        .power-tag {
+          font-size: 9px;
+          padding: 1px 5px;
+          border-radius: 2px;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+        }
+
+        .tag-active { background: #2a3a2a; color: #7aaa7a; border: 1px solid #4a7a4a; }
+        .tag-passive { background: #2a2a3a; color: #7a7aaa; border: 1px solid #4a4a7a; }
+        .tag-conditional { background: #3a2a2a; color: #aa7a7a; border: 1px solid #7a4a4a; }
+
+        /* ── SPIRITUALITY BAR ── */
+        .spi-container {
+          background: var(--surface);
+          border: 1px solid var(--gold);
+          border-radius: 4px;
+          padding: 12px;
+          margin-bottom: 12px;
+        }
+
+        .spi-title {
+          font-family: 'Cinzel', serif;
+          font-size: 11px;
+          letter-spacing: 2px;
+          color: var(--gold);
+          text-align: center;
+          margin-bottom: 10px;
+        }
+
+        .spi-fields {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 12px;
+          margin-bottom: 8px;
+        }
+
+        .spi-value {
+          text-align: center;
+        }
+
+        .spi-value label {
+          text-align: center;
+        }
+
+        .spi-input {
+          font-family: 'Cinzel', serif;
+          font-size: 22px;
+          color: var(--gold);
+          background: var(--input-bg);
+          border: 1px solid var(--border);
+          border-radius: 4px;
+          text-align: center;
+          width: 100%;
+          padding: 4px;
+          outline: none;
+        }
+
+        .spi-input:focus { border-color: var(--gold); }
+
+        /* ── IDENTITY BLOCK ── */
+        .identity-block {
+          background: var(--surface);
+          border: 1px solid var(--gold);
+          border-radius: 4px;
+          padding: 12px;
+          margin-bottom: 16px;
+        }
+
+        .identity-fields {
+          display: grid;
+          grid-template-columns: 1fr 1fr 1fr;
+          gap: 12px;
+        }
+
+        /* ── CHAR INFO ── */
+        .char-info {
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: 4px;
+          padding: 10px;
+          margin-bottom: 12px;
+        }
+
+        .char-info-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 8px 16px;
+        }
+
+        /* ── STATS ROW ── */
+        .stats-row {
+          display: grid;
+          grid-template-columns: repeat(5, 1fr);
+          gap: 8px;
+          margin-bottom: 12px;
+        }
+
+        .stat-box {
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: 4px;
+          padding: 6px 8px;
+          text-align: center;
+        }
+
+        .stat-box label {
+          text-align: center;
+          font-size: 9px;
+        }
+
+        .stat-box input {
+          text-align: center;
+          font-size: 14px;
+          font-weight: 600;
+          color: var(--gold);
+        }
+
+        /* ── DIVIDER ── */
+        .divider {
+          border: none;
+          border-top: 1px solid var(--border);
+          margin: 14px 0;
+        }
+
+        hr.gold { border-top-color: var(--gold); opacity: 0.3; }
+
+        /* ── ASPIRATIONS / CONDITIONS ── */
+        .list-block {
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: 4px;
+          padding: 10px;
+        }
+
+        .list-item {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          margin-bottom: 6px;
+        }
+
+        .list-bullet {
+          color: var(--gold);
+          font-size: 10px;
+          flex-shrink: 0;
+        }
+
+        .mb-8 { margin-bottom: 8px; }
+        .mb-12 { margin-bottom: 12px; }
+        .mb-16 { margin-bottom: 16px; }
+
+        /* ── SEQUENCE BADGE ── */
+        .seq-badge {
+          font-family: 'Cinzel', serif;
+          font-size: 10px;
+          color: var(--text-dim);
+          text-align: center;
+        }
+
+        /* ── STATUS SELECTOR ── */
+        .status-cell {
+          display: flex;
+          gap: 6px;
+          align-items: center;
+        }
+
+        /* ── PRINT ── */
+        @media print {
+          body { background: white; }
+          .tab-bar { display: none; }
+          .tab-content { display: block !important; page-break-after: always; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="sheet-header">
+    <div>
+        <div class="sheet-title">LORD OF MYSTERIES</div>
+        <div class="sheet-subtitle">Character Sheet · Beyond the Sequences</div>
+    </div>
+    <div class="header-ornament">⚜</div>
+</header>
+
+<nav class="tab-bar">
+    <button class="tab-btn active" onclick="showTab('page1', this)">I — Character</button>
+    <button class="tab-btn" onclick="showTab('page2', this)">II — Beyonder Path</button>
+    <button class="tab-btn" onclick="showTab('page3', this)">III — Powers</button>
+</nav>
+
+<!-- ══════════════════════════════════════════
+     PAGE 1 — STANDARD SHEET
+══════════════════════════════════════════ -->
+<div id="page1" class="tab-content active">
+
+    <!-- Character Info -->
+    <div class="char-info mb-12">
+        <div class="char-info-grid">
+            <div class="field-group"><label>Name</label><input type="text"></div>
+            <div class="field-group"><label>Virtue</label><input type="text"></div>
+            <div class="field-group"><label>Chronicle</label><input type="text"></div>
+            <div class="field-group"><label>Age</label><input type="text"></div>
+            <div class="field-group"><label>Vice</label><input type="text"></div>
+            <div class="field-group"><label>Faction</label><input type="text"></div>
+            <div class="field-group"><label>Player</label><input type="text"></div>
+            <div class="field-group"><label>Concept</label><input type="text"></div>
+            <div class="field-group"><label>Group Name</label><input type="text"></div>
+        </div>
+    </div>
+
+    <!-- ATTRIBUTES -->
+    <div class="section-title">Attributes</div>
+    <div class="grid-3 mb-12">
+
+        <div class="attr-block">
+            <div class="attr-category">Mental</div>
+            <div class="attr-row">
+                <span class="attr-role">Power</span>
+                <span class="attr-name">Intelligence</span>
+                <div class="dots" data-max="5" data-filled="1">
+                    <div class="dot filled" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div>
+                </div>
+            </div>
+            <div class="attr-row">
+                <span class="attr-role">Finesse</span>
+                <span class="attr-name">Wits</span>
+                <div class="dots">
+                    <div class="dot filled" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div>
+                </div>
+            </div>
+            <div class="attr-row">
+                <span class="attr-role">Resistance</span>
+                <span class="attr-name">Resolve</span>
+                <div class="dots">
+                    <div class="dot filled" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="attr-block">
+            <div class="attr-category">Physical</div>
+            <div class="attr-row">
+                <span class="attr-role">Power</span>
+                <span class="attr-name">Strength</span>
+                <div class="dots">
+                    <div class="dot filled" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div>
+                </div>
+            </div>
+            <div class="attr-row">
+                <span class="attr-role">Finesse</span>
+                <span class="attr-name">Dexterity</span>
+                <div class="dots">
+                    <div class="dot filled" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div>
+                </div>
+            </div>
+            <div class="attr-row">
+                <span class="attr-role">Resistance</span>
+                <span class="attr-name">Stamina</span>
+                <div class="dots">
+                    <div class="dot filled" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="attr-block">
+            <div class="attr-category">Social</div>
+            <div class="attr-row">
+                <span class="attr-role">Power</span>
+                <span class="attr-name">Presence</span>
+                <div class="dots">
+                    <div class="dot filled" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div>
+                </div>
+            </div>
+            <div class="attr-row">
+                <span class="attr-role">Finesse</span>
+                <span class="attr-name">Manipulation</span>
+                <div class="dots">
+                    <div class="dot filled" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div>
+                </div>
+            </div>
+            <div class="attr-row">
+                <span class="attr-role">Resistance</span>
+                <span class="attr-name">Composure</span>
+                <div class="dots">
+                    <div class="dot filled" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SKILLS + OTHER TRAITS -->
+    <div class="grid-2 mb-12">
+
+        <!-- SKILLS -->
+        <div>
+            <div class="section-title">Skills</div>
+            <div class="grid-3">
+
+                <div class="skill-col">
+                    <div class="skill-category">Mental</div>
+                    <div class="skill-unskilled">(-3 unskilled)</div>
+                    <div class="skill-row"><span class="skill-name">Academics</span><div class="dots">
+                        <div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div>
+                    </div></div>
+                    <div class="skill-row"><span class="skill-name">Computer</span><div class="dots">
+                        <div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div>
+                    </div></div>
+                    <div class="skill-row"><span class="skill-name">Crafts</span><div class="dots">
+                        <div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div>
+                    </div></div>
+                    <div class="skill-row"><span class="skill-name">Investigation</span><div class="dots">
+                        <div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div>
+                    </div></div>
+                    <div class="skill-row"><span class="skill-name">Medicine</span><div class="dots">
+                        <div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div>
+                    </div></div>
+                    <div class="skill-row"><span class="skill-name">Occult</span><div class="dots">
+                        <div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div>
+                    </div></div>
+                    <div class="skill-row"><span class="skill-name">Politics</span><div class="dots">
+                        <div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div>
+                    </div></div>
+                    <div class="skill-row"><span class="skill-name">Science</span><div class="dots">
+                        <div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div>
+                    </div></div>
+                </div>
+
+                <div class="skill-col">
+                    <div class="skill-category">Physical</div>
+                    <div class="skill-unskilled">(-1 unskilled)</div>
+                    <div class="skill-row"><span class="skill-name">Athletics</span><div class="dots">
+                        <div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div>
+                    </div></div>
+                    <div class="skill-row"><span class="skill-name">Brawl</span><div class="dots">
+                        <div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div>
+                    </div></div>
+                    <div class="skill-row"><span class="skill-name">Drive</span><div class="dots">
+                        <div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div>
+                    </div></div>
+                    <div class="skill-row"><span class="skill-name">Firearms</span><div class="dots">
+                        <div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div>
+                    </div></div>
+                    <div class="skill-row"><span class="skill-name">Larceny</span><div class="dots">
+                        <div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div>
+                    </div></div>
+                    <div class="skill-row"><span class="skill-name">Stealth</span><div class="dots">
+                        <div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div>
+                    </div></div>
+                    <div class="skill-row"><span class="skill-name">Survival</span><div class="dots">
+                        <div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div>
+                    </div></div>
+                    <div class="skill-row"><span class="skill-name">Weaponry</span><div class="dots">
+                        <div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div>
+                    </div></div>
+                </div>
+
+                <div class="skill-col">
+                    <div class="skill-category">Social</div>
+                    <div class="skill-unskilled">(-1 unskilled)</div>
+                    <div class="skill-row"><span class="skill-name">Animal Ken</span><div class="dots">
+                        <div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div>
+                    </div></div>
+                    <div class="skill-row"><span class="skill-name">Empathy</span><div class="dots">
+                        <div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div>
+                    </div></div>
+                    <div class="skill-row"><span class="skill-name">Expression</span><div class="dots">
+                        <div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div>
+                    </div></div>
+                    <div class="skill-row"><span class="skill-name">Intimidation</span><div class="dots">
+                        <div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div>
+                    </div></div>
+                    <div class="skill-row"><span class="skill-name">Persuasion</span><div class="dots">
+                        <div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div>
+                    </div></div>
+                    <div class="skill-row"><span class="skill-name">Socialize</span><div class="dots">
+                        <div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div>
+                    </div></div>
+                    <div class="skill-row"><span class="skill-name">Streetwise</span><div class="dots">
+                        <div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div>
+                    </div></div>
+                    <div class="skill-row"><span class="skill-name">Subterfuge</span><div class="dots">
+                        <div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div>
+                    </div></div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- OTHER TRAITS -->
+        <div>
+            <div class="section-title">Other Traits</div>
+
+            <!-- Merits -->
+            <div class="track-block mb-8">
+                <div class="track-title">Merits</div>
+                <div id="merits-list">
+                    <div class="merit-row"><input type="text" class="merit-name-input" placeholder="Merit name"><div class="dots" style="flex-shrink:0">
+                        <div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div>
+                    </div></div>
+                    <div class="merit-row"><input type="text" class="merit-name-input" placeholder="Merit name"><div class="dots" style="flex-shrink:0">
+                        <div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div>
+                    </div></div>
+                    <div class="merit-row"><input type="text" class="merit-name-input" placeholder="Merit name"><div class="dots" style="flex-shrink:0">
+                        <div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div>
+                    </div></div>
+                    <div class="merit-row"><input type="text" class="merit-name-input" placeholder="Merit name"><div class="dots" style="flex-shrink:0">
+                        <div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div>
+                    </div></div>
+                    <div class="merit-row"><input type="text" class="merit-name-input" placeholder="Merit name"><div class="dots" style="flex-shrink:0">
+                        <div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div>
+                    </div></div>
+                    <div class="merit-row"><input type="text" class="merit-name-input" placeholder="Merit name"><div class="dots" style="flex-shrink:0">
+                        <div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div>
+                    </div></div>
+                </div>
+            </div>
+
+            <!-- Health -->
+            <div class="track-block mb-8">
+                <div class="track-title">Health</div>
+                <div class="track-dots" id="health-track">
+                    <div class="health-dot" onclick="cycleHealth(this)"></div>
+                    <div class="health-dot" onclick="cycleHealth(this)"></div>
+                    <div class="health-dot" onclick="cycleHealth(this)"></div>
+                    <div class="health-dot" onclick="cycleHealth(this)"></div>
+                    <div class="health-dot" onclick="cycleHealth(this)"></div>
+                    <div class="health-dot" onclick="cycleHealth(this)"></div>
+                    <div class="health-dot" onclick="cycleHealth(this)"></div>
+                    <div class="health-dot" onclick="cycleHealth(this)"></div>
+                    <div class="health-dot" onclick="cycleHealth(this)"></div>
+                    <div class="health-dot" onclick="cycleHealth(this)"></div>
+                </div>
+                <div style="text-align:center; font-size:9px; color:var(--text-dim); margin-top:4px; letter-spacing:1px;">
+                    click: empty → / → X → ✶ → empty
+                </div>
+            </div>
+
+            <!-- Willpower -->
+            <div class="track-block mb-8">
+                <div class="track-title">Willpower</div>
+                <div class="track-dots">
+                    <div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div>
+                    <div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div>
+                </div>
+                <div class="track-dots" style="margin-top:4px">
+                    <div class="health-dot" onclick="cycleHealth(this)"></div>
+                    <div class="health-dot" onclick="cycleHealth(this)"></div>
+                    <div class="health-dot" onclick="cycleHealth(this)"></div>
+                    <div class="health-dot" onclick="cycleHealth(this)"></div>
+                    <div class="health-dot" onclick="cycleHealth(this)"></div>
+                    <div class="health-dot" onclick="cycleHealth(this)"></div>
+                    <div class="health-dot" onclick="cycleHealth(this)"></div>
+                    <div class="health-dot" onclick="cycleHealth(this)"></div>
+                    <div class="health-dot" onclick="cycleHealth(this)"></div>
+                    <div class="health-dot" onclick="cycleHealth(this)"></div>
+                </div>
+            </div>
+
+            <!-- Corruption -->
+            <div class="corruption-block mb-8">
+                <div class="corruption-title">Corruption</div>
+                <div class="corruption-zones" id="corruption-track">
+                    <div class="c-dot" onclick="toggleCorruption(this, 10)" title="10 — Pure"></div>
+                    <div class="c-dot" onclick="toggleCorruption(this, 9)" title="9"></div>
+                    <div class="c-dot" onclick="toggleCorruption(this, 8)" title="8"></div>
+                    <div class="c-dot" onclick="toggleCorruption(this, 7)" title="7 — Starting"></div>
+                    <div class="c-dot" onclick="toggleCorruption(this, 6)" title="6"></div>
+                    <div class="c-dot" onclick="toggleCorruption(this, 5)" title="5"></div>
+                    <div class="c-dot" onclick="toggleCorruption(this, 4)" title="4 — Stable limit"></div>
+                    <div class="c-dot critical" onclick="toggleCorruption(this, 3)" title="3 — Critical zone"></div>
+                    <div class="c-dot critical" onclick="toggleCorruption(this, 2)" title="2"></div>
+                    <div class="c-dot critical" onclick="toggleCorruption(this, 1)" title="1 — Near rampager"></div>
+                </div>
+                <div class="corruption-legend">
+                    <span>10 — Pure</span>
+                    <span style="color:var(--crimson-light)">■ Critical zone</span>
+                    <span>1 — Rampager</span>
+                </div>
+                <hr class="divider" style="margin:8px 0">
+                <div style="font-size:10px; color:var(--text-label); margin-bottom:4px; letter-spacing:1px;">DERANGEMENTS</div>
+                <div class="derangement-row">
+                    <input type="text" class="derangement-name" placeholder="Derangement name">
+                    <input type="text" class="derangement-level" placeholder="Lvl" title="Corruption level">
+                </div>
+                <div class="derangement-row">
+                    <input type="text" class="derangement-name" placeholder="Derangement name">
+                    <input type="text" class="derangement-level" placeholder="Lvl">
+                </div>
+                <div class="derangement-row">
+                    <input type="text" class="derangement-name" placeholder="Derangement name">
+                    <input type="text" class="derangement-level" placeholder="Lvl">
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- STATS ROW -->
+    <div class="section-title">Derived Stats</div>
+    <div class="stats-row mb-12">
+        <div class="stat-box"><label>Size</label><input type="text" style="background:transparent;border:none;width:100%;text-align:center;font-size:14px;color:var(--gold);" value="5"></div>
+        <div class="stat-box"><label>Speed</label><input type="text" style="background:transparent;border:none;width:100%;text-align:center;font-size:14px;color:var(--gold);"></div>
+        <div class="stat-box"><label>Defense</label><input type="text" style="background:transparent;border:none;width:100%;text-align:center;font-size:14px;color:var(--gold);"></div>
+        <div class="stat-box"><label>Initiative</label><input type="text" style="background:transparent;border:none;width:100%;text-align:center;font-size:14px;color:var(--gold);"></div>
+        <div class="stat-box"><label>Armor</label><input type="text" style="background:transparent;border:none;width:100%;text-align:center;font-size:14px;color:var(--gold);"></div>
+    </div>
+
+    <!-- ASPIRATIONS + CONDITIONS -->
+    <div class="grid-2 mb-12">
+        <div>
+            <div class="section-title">Aspirations</div>
+            <div class="list-block">
+                <div class="list-item"><span class="list-bullet">◆</span><input type="text" placeholder="Short-term aspiration"></div>
+                <div class="list-item"><span class="list-bullet">◆</span><input type="text" placeholder="Short-term aspiration"></div>
+                <div class="list-item"><span class="list-bullet">◇</span><input type="text" placeholder="Long-term aspiration"></div>
+            </div>
+        </div>
+        <div>
+            <div class="section-title">Conditions</div>
+            <div class="list-block">
+                <div class="list-item"><span class="list-bullet">·</span><input type="text" placeholder="Condition"></div>
+                <div class="list-item"><span class="list-bullet">·</span><input type="text" placeholder="Condition"></div>
+                <div class="list-item"><span class="list-bullet">·</span><input type="text" placeholder="Condition"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WEAPONS + EQUIPMENT -->
+    <div class="grid-2">
+        <div>
+            <div class="section-title">Weapons & Attacks</div>
+            <table class="sheet-table">
+                <thead><tr><th>Weapon</th><th>Dmg</th><th>Range</th><th>Init</th><th>Str</th></tr></thead>
+                <tbody>
+                <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div>
+            <div class="section-title">Equipment</div>
+            <table class="sheet-table">
+                <thead><tr><th>Item</th><th>Dur</th><th>Str</th><th>Size</th><th>Cost</th></tr></thead>
+                <tbody>
+                <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- BEATS + XP -->
+    <div class="grid-2">
+        <div class="stat-box" style="display:flex;gap:12px;align-items:center;padding:8px 12px;">
+            <label style="display:inline;margin:0">Beats</label>
+            <div class="dots">
+                <div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div>
+                <div class="dot" onclick="toggleDot(this)"></div><div class="dot" onclick="toggleDot(this)"></div>
+                <div class="dot" onclick="toggleDot(this)"></div>
+            </div>
+            <label style="display:inline;margin:0">Experiences</label>
+            <input type="text" style="background:transparent;border-bottom:1px solid var(--border);width:40px;text-align:center;color:var(--gold);">
+        </div>
+    </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════
+     PAGE 2 — BEYONDER PATH
+══════════════════════════════════════════ -->
+<div id="page2" class="tab-content">
+
+    <!-- Identity -->
+    <div class="section-title">Beyonder Identity</div>
+    <div class="identity-block mb-16">
+        <div class="identity-fields">
+            <div class="field-group"><label>Pathway</label><input type="text" placeholder="e.g. The Fool"></div>
+            <div class="field-group"><label>Current Sequence</label><input type="text" placeholder="e.g. S7 — Magician"></div>
+            <div class="field-group"><label>Qualitative Category</label><input type="text" placeholder="e.g. Category 1"></div>
+        </div>
+    </div>
+
+    <!-- Potions & Digestion -->
+    <div class="section-title">Potions Consumed & Digestion</div>
+    <table class="sheet-table mb-8">
+        <thead>
+        <tr>
+            <th style="width:30px">#</th>
+            <th style="width:50px">Seq.</th>
+            <th>Pathway / Potion Name</th>
+            <th style="width:70px">Type</th>
+            <th style="width:100px">Digestion</th>
+            <th>Notes</th>
+        </tr>
+        </thead>
+        <tbody id="potions-body">
+        <tr>
+            <td style="text-align:center;color:var(--text-dim)">1</td>
+            <td style="text-align:center;color:var(--gold-light)">S9</td>
+            <td><input type="text" placeholder="Potion name"></td>
+            <td>
+                <label class="custom-check"><input type="checkbox"><span class="check-box">✓</span> T1</label>
+                <label class="custom-check"><input type="checkbox"><span class="check-box">✓</span> T2</label>
+            </td>
+            <td><div class="dig-dots">
+                <div class="dig-dot" onclick="toggleDigDot(this)"></div>
+                <div class="dig-dot" onclick="toggleDigDot(this)"></div>
+                <div class="dig-dot" onclick="toggleDigDot(this)"></div>
+                <div class="dig-dot" onclick="toggleDigDot(this)"></div>
+                <div class="dig-dot" onclick="toggleDigDot(this)"></div>
+            </div></td>
+            <td><input type="text" placeholder=""></td>
+        </tr>
+        <tr>
+            <td style="text-align:center;color:var(--text-dim)">2</td>
+            <td style="text-align:center;color:var(--gold-light)">S8</td>
+            <td><input type="text" placeholder="Potion name"></td>
+            <td>
+                <label class="custom-check"><input type="checkbox"><span class="check-box">✓</span> T1</label>
+                <label class="custom-check"><input type="checkbox"><span class="check-box">✓</span> T2</label>
+            </td>
+            <td><div class="dig-dots">
+                <div class="dig-dot" onclick="toggleDigDot(this)"></div><div class="dig-dot" onclick="toggleDigDot(this)"></div><div class="dig-dot" onclick="toggleDigDot(this)"></div><div class="dig-dot" onclick="toggleDigDot(this)"></div><div class="dig-dot" onclick="toggleDigDot(this)"></div>
+            </div></td>
+            <td><input type="text"></td>
+        </tr>
+        <tr>
+            <td style="text-align:center;color:var(--text-dim)">3</td>
+            <td style="text-align:center;color:var(--gold-light)">S7</td>
+            <td><input type="text" placeholder="Potion name"></td>
+            <td>
+                <label class="custom-check"><input type="checkbox"><span class="check-box">✓</span> T1</label>
+                <label class="custom-check"><input type="checkbox"><span class="check-box">✓</span> T2</label>
+            </td>
+            <td><div class="dig-dots">
+                <div class="dig-dot" onclick="toggleDigDot(this)"></div><div class="dig-dot" onclick="toggleDigDot(this)"></div><div class="dig-dot" onclick="toggleDigDot(this)"></div><div class="dig-dot" onclick="toggleDigDot(this)"></div><div class="dig-dot" onclick="toggleDigDot(this)"></div>
+            </div></td>
+            <td><input type="text"></td>
+        </tr>
+        <tr>
+            <td style="text-align:center;color:var(--text-dim)">4</td>
+            <td style="text-align:center;color:var(--gold-light)">S6</td>
+            <td><input type="text" placeholder="Potion name"></td>
+            <td>
+                <label class="custom-check"><input type="checkbox"><span class="check-box">✓</span> T1</label>
+                <label class="custom-check"><input type="checkbox"><span class="check-box">✓</span> T2</label>
+            </td>
+            <td><div class="dig-dots">
+                <div class="dig-dot" onclick="toggleDigDot(this)"></div><div class="dig-dot" onclick="toggleDigDot(this)"></div><div class="dig-dot" onclick="toggleDigDot(this)"></div><div class="dig-dot" onclick="toggleDigDot(this)"></div><div class="dig-dot" onclick="toggleDigDot(this)"></div>
+            </div></td>
+            <td><input type="text"></td>
+        </tr>
+        <tr>
+            <td style="text-align:center;color:var(--text-dim)">5</td>
+            <td style="text-align:center;color:var(--gold-light)">S5</td>
+            <td><input type="text" placeholder="Potion name"></td>
+            <td>
+                <label class="custom-check"><input type="checkbox"><span class="check-box">✓</span> T1</label>
+                <label class="custom-check"><input type="checkbox"><span class="check-box">✓</span> T2</label>
+            </td>
+            <td><div class="dig-dots">
+                <div class="dig-dot" onclick="toggleDigDot(this)"></div><div class="dig-dot" onclick="toggleDigDot(this)"></div><div class="dig-dot" onclick="toggleDigDot(this)"></div><div class="dig-dot" onclick="toggleDigDot(this)"></div><div class="dig-dot" onclick="toggleDigDot(this)"></div>
+            </div></td>
+            <td><input type="text"></td>
+        </tr>
+        <tr>
+            <td style="text-align:center;color:var(--text-dim)">6</td>
+            <td style="text-align:center;color:var(--gold-light)">S4</td>
+            <td><input type="text" placeholder="Potion name"></td>
+            <td>
+                <label class="custom-check"><input type="checkbox"><span class="check-box">✓</span> T1</label>
+                <label class="custom-check"><input type="checkbox"><span class="check-box">✓</span> T2</label>
+            </td>
+            <td><div class="dig-dots">
+                <div class="dig-dot" onclick="toggleDigDot(this)"></div><div class="dig-dot" onclick="toggleDigDot(this)"></div><div class="dig-dot" onclick="toggleDigDot(this)"></div><div class="dig-dot" onclick="toggleDigDot(this)"></div><div class="dig-dot" onclick="toggleDigDot(this)"></div>
+            </div></td>
+            <td><input type="text"></td>
+        </tr>
+        <tr>
+            <td style="text-align:center;color:var(--text-dim)">7</td>
+            <td style="text-align:center;color:var(--gold-light)">S3</td>
+            <td><input type="text" placeholder="Potion name"></td>
+            <td>
+                <label class="custom-check"><input type="checkbox"><span class="check-box">✓</span> T1</label>
+                <label class="custom-check"><input type="checkbox"><span class="check-box">✓</span> T2</label>
+            </td>
+            <td><div class="dig-dots">
+                <div class="dig-dot" onclick="toggleDigDot(this)"></div><div class="dig-dot" onclick="toggleDigDot(this)"></div><div class="dig-dot" onclick="toggleDigDot(this)"></div><div class="dig-dot" onclick="toggleDigDot(this)"></div><div class="dig-dot" onclick="toggleDigDot(this)"></div>
+            </div></td>
+            <td><input type="text"></td>
+        </tr>
+        <tr>
+            <td style="text-align:center;color:var(--text-dim)">8</td>
+            <td style="text-align:center;color:var(--gold-light)">S2</td>
+            <td><input type="text" placeholder="Potion name"></td>
+            <td>
+                <label class="custom-check"><input type="checkbox"><span class="check-box">✓</span> T1</label>
+                <label class="custom-check"><input type="checkbox"><span class="check-box">✓</span> T2</label>
+            </td>
+            <td><div class="dig-dots">
+                <div class="dig-dot" onclick="toggleDigDot(this)"></div><div class="dig-dot" onclick="toggleDigDot(this)"></div><div class="dig-dot" onclick="toggleDigDot(this)"></div><div class="dig-dot" onclick="toggleDigDot(this)"></div><div class="dig-dot" onclick="toggleDigDot(this)"></div>
+            </div></td>
+            <td><input type="text"></td>
+        </tr>
+        <tr>
+            <td style="text-align:center;color:var(--text-dim)">9</td>
+            <td style="text-align:center;color:var(--gold-light)">S1</td>
+            <td><input type="text" placeholder="Potion name"></td>
+            <td>
+                <label class="custom-check"><input type="checkbox"><span class="check-box">✓</span> T1</label>
+                <label class="custom-check"><input type="checkbox"><span class="check-box">✓</span> T2</label>
+            </td>
+            <td><div class="dig-dots">
+                <div class="dig-dot" onclick="toggleDigDot(this)"></div><div class="dig-dot" onclick="toggleDigDot(this)"></div><div class="dig-dot" onclick="toggleDigDot(this)"></div><div class="dig-dot" onclick="toggleDigDot(this)"></div><div class="dig-dot" onclick="toggleDigDot(this)"></div>
+            </div></td>
+            <td><input type="text"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="ref-box">
+        <strong>Type:</strong> T1 = creature remains (baseline) · T2 = Beyonder Characteristic (−2 Digestion to all previous potions)<br>
+        <strong>Digestion → Corruption rolls:</strong> level 3–4 = +1 die · level 5 = +2 dice<br>
+        <strong>Digestion → Resonance rolls:</strong> each undigested potion (level 1–4) = −1 die (cumulative)
+    </div>
+
+    <!-- Derangements full -->
+    <div class="section-title">Derangements — Full Description</div>
+    <table class="sheet-table">
+        <thead>
+        <tr>
+            <th>Derangement</th>
+            <th style="width:60px">Corruption</th>
+            <th>Full Description & Mechanical Effects</th>
+            <th style="width:110px">Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><input type="text" placeholder="Name"></td>
+            <td><input type="text" style="text-align:center" placeholder="Lvl"></td>
+            <td><input type="text" placeholder="Description and effects..."></td>
+            <td>
+                <label class="custom-check"><input type="checkbox"><span class="check-box">✓</span> Dormant</label>
+                <label class="custom-check"><input type="checkbox"><span class="check-box">✓</span> Active</label>
+            </td>
+        </tr>
+        <tr>
+            <td><input type="text" placeholder="Name"></td>
+            <td><input type="text" style="text-align:center" placeholder="Lvl"></td>
+            <td><input type="text" placeholder="Description and effects..."></td>
+            <td>
+                <label class="custom-check"><input type="checkbox"><span class="check-box">✓</span> Dormant</label>
+                <label class="custom-check"><input type="checkbox"><span class="check-box">✓</span> Active</label>
+            </td>
+        </tr>
+        <tr>
+            <td><input type="text" placeholder="Name"></td>
+            <td><input type="text" style="text-align:center" placeholder="Lvl"></td>
+            <td><input type="text" placeholder="Description and effects..."></td>
+            <td>
+                <label class="custom-check"><input type="checkbox"><span class="check-box">✓</span> Dormant</label>
+                <label class="custom-check"><input type="checkbox"><span class="check-box">✓</span> Active</label>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+
+<!-- ══════════════════════════════════════════
+     PAGE 3 — SPIRITUALITY & POWERS
+══════════════════════════════════════════ -->
+<div id="page3" class="tab-content">
+
+    <!-- Spirituality -->
+    <div class="spi-container">
+        <div class="spi-title">⚡ Spirituality</div>
+        <div class="spi-fields">
+            <div class="spi-value">
+                <label>Maximum Pool</label>
+                <input type="text" class="spi-input" placeholder="—">
+            </div>
+            <div class="spi-value">
+                <label>Current Pool</label>
+                <input type="text" class="spi-input" placeholder="—">
+            </div>
+        </div>
+        <div class="ref-box">
+            <strong>Night rest</strong> → 10% of maximum (round down)<br>
+            <strong>Active Cogitation</strong> → Willpower roll + tier bonus · 10% base · 20% with 2 extra successes · 1×/day<br>
+            <strong>Completed Digestion</strong> → 10% automatic<br>
+            <strong>Pathway-aligned condition</strong> → see Pathway sheet
+        </div>
+    </div>
+
+    <!-- Active Powers -->
+    <div class="section-title">Active Powers <span class="power-tag tag-active" style="margin-left:6px">Active</span></div>
+    <table class="sheet-table mb-12">
+        <thead>
+        <tr>
+            <th>Power Name</th>
+            <th style="width:60px">Cost</th>
+            <th>Base Effect</th>
+            <th>Enhanced Effect</th>
+            <th style="width:80px">Notes</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr><td><input type="text"></td><td><input type="text" style="text-align:center"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+        <tr><td><input type="text"></td><td><input type="text" style="text-align:center"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+        <tr><td><input type="text"></td><td><input type="text" style="text-align:center"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+        <tr><td><input type="text"></td><td><input type="text" style="text-align:center"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+        <tr><td><input type="text"></td><td><input type="text" style="text-align:center"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+        <tr><td><input type="text"></td><td><input type="text" style="text-align:center"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+        <tr><td><input type="text"></td><td><input type="text" style="text-align:center"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+        <tr><td><input type="text"></td><td><input type="text" style="text-align:center"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+        </tbody>
+    </table>
+
+    <div class="grid-2">
+        <!-- Permanent Passive -->
+        <div>
+            <div class="section-title">Permanent Passives <span class="power-tag tag-passive" style="margin-left:6px">Passive</span></div>
+            <table class="sheet-table">
+                <thead><tr><th>Power Name</th><th>Effect</th></tr></thead>
+                <tbody>
+                <tr><td><input type="text"></td><td><input type="text"></td></tr>
+                <tr><td><input type="text"></td><td><input type="text"></td></tr>
+                <tr><td><input type="text"></td><td><input type="text"></td></tr>
+                <tr><td><input type="text"></td><td><input type="text"></td></tr>
+                <tr><td><input type="text"></td><td><input type="text"></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Conditional Passive -->
+        <div>
+            <div class="section-title">Conditional Passives <span class="power-tag tag-conditional" style="margin-left:6px">Conditional</span></div>
+            <table class="sheet-table">
+                <thead><tr><th>Power Name</th><th>Condition</th><th style="width:80px">Cost</th><th>Effect</th></tr></thead>
+                <tbody>
+                <tr>
+                    <td><input type="text"></td>
+                    <td><input type="text"></td>
+                    <td style="font-size:10px;color:var(--text-dim);text-align:center">1 Spi/scene</td>
+                    <td><input type="text"></td>
+                </tr>
+                <tr>
+                    <td><input type="text"></td>
+                    <td><input type="text"></td>
+                    <td style="font-size:10px;color:var(--text-dim);text-align:center">1 Spi/scene</td>
+                    <td><input type="text"></td>
+                </tr>
+                <tr>
+                    <td><input type="text"></td>
+                    <td><input type="text"></td>
+                    <td style="font-size:10px;color:var(--text-dim);text-align:center">1 Spi/scene</td>
+                    <td><input type="text"></td>
+                </tr>
+                <tr>
+                    <td><input type="text"></td>
+                    <td><input type="text"></td>
+                    <td style="font-size:10px;color:var(--text-dim);text-align:center">1 Spi/scene</td>
+                    <td><input type="text"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // ── TAB SWITCHING ──
+    function showTab(id, btn) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      btn.classList.add('active');
+    }
+
+    // ── DOT TOGGLE ──
+    function toggleDot(dot) {
+      dot.classList.toggle('filled');
+    }
+
+    // ── DIGESTION DOT ──
+    function toggleDigDot(dot) {
+      const row = dot.parentElement;
+      const dots = row.querySelectorAll('.dig-dot');
+      const idx = Array.from(dots).indexOf(dot);
+      // Fill up to clicked, unfill rest
+      const anyFilled = Array.from(dots).some(d => d.classList.contains('filled'));
+      const clickedFilled = dot.classList.contains('filled');
+      const lastFilled = Array.from(dots).reduce((acc, d, i) => d.classList.contains('filled') ? i : acc, -1);
+
+      if (clickedFilled && idx === lastFilled) {
+        dot.classList.remove('filled');
+      } else {
+        dots.forEach((d, i) => {
+          if (i <= idx) d.classList.add('filled');
+          else d.classList.remove('filled');
+        });
+      }
+    }
+
+    // ── HEALTH CYCLE ──
+    const healthStates = ['', 'bashing', 'lethal', 'aggravated'];
+    const healthSymbols = ['', '/', 'X', '✶'];
+    function cycleHealth(dot) {
+      let state = dot.dataset.state ? parseInt(dot.dataset.state) : 0;
+      state = (state + 1) % 4;
+      dot.dataset.state = state;
+      dot.className = 'health-dot' + (state > 0 ? ' ' + healthStates[state] : '');
+      dot.textContent = healthSymbols[state];
+    }
+
+    // ── CORRUPTION TRACK ──
+    function toggleCorruption(dot, level) {
+      const track = document.getElementById('corruption-track');
+      const dots = track.querySelectorAll('.c-dot');
+      const isCritical = level <= 3;
+
+      // Find current filled level
+      let currentLevel = 0;
+      dots.forEach((d, i) => {
+        if (d.classList.contains('filled-stable') || d.classList.contains('filled-critical')) {
+          currentLevel = 10 - i;
+        }
+      });
+
+      if (currentLevel === level) {
+        // Unfill this dot
+        dots.forEach(d => {
+          d.classList.remove('filled-stable', 'filled-critical');
+        });
+      } else {
+        // Fill from 10 down to selected level
+        dots.forEach((d, i) => {
+          const dotLevel = 10 - i;
+          d.classList.remove('filled-stable', 'filled-critical');
+          if (dotLevel >= level) {
+            if (dotLevel <= 3) d.classList.add('filled-critical');
+            else d.classList.add('filled-stable');
+          }
+        });
+      }
+    }
+
+    // Set starting corruption at 7
+    window.addEventListener('load', () => {
+      const track = document.getElementById('corruption-track');
+      const dots = track.querySelectorAll('.c-dot');
+      dots.forEach((d, i) => {
+        const level = 10 - i;
+        if (level >= 7) {
+          if (level <= 3) d.classList.add('filled-critical');
+          else d.classList.add('filled-stable');
+        }
+      });
+    });
+</script>
+</body>
+</html>
